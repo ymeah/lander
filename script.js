@@ -2,6 +2,7 @@ const startBtn = document.getElementById("startBtn");
 const statusDiv = document.getElementById("status");
 const canvas = document.getElementById("game-area");
 const ctx = canvas.getContext("2d");
+const initialFuel = 1000;
 
 class Rect {
   constructor(x, y, w, h) {
@@ -62,6 +63,9 @@ ship.leftEngine= false;
 ship.rightEngine= false;
 ship.crashed= false;
 ship.landed= false;
+ship.hasFuel = function(){
+  return this.fuel > 0;
+}
 
 const terrain = [];
 
@@ -106,6 +110,7 @@ function initShip() {
   ship.rightEngine = false;
   ship.crashed = false;
   ship.landed = false;
+  ship.fuel = initialFuel;
 }
 
 function initPrjs() {
@@ -141,7 +146,7 @@ function drawShip() {
   ctx.closePath();
 
   // Draw the flame if engine is on
-  if (ship.mainEngine) {
+  if (ship.hasFuel() && ship.mainEngine) {
     drawTriangle(
       [ship.w * -0.5, ship.h * 0.5],
       [ship.w * 0.5, ship.h * 0.5],
@@ -149,7 +154,7 @@ function drawShip() {
       "orange"
     );
   }
-  if (ship.rightEngine) {
+  if (ship.hasFuel() && ship.rightEngine) {
     drawTriangle(
       [ship.w * 0.5, ship.h * -0.25],
       [ship.w * 0.5 + Math.random() * 10, 0],
@@ -157,7 +162,7 @@ function drawShip() {
       "orange"
     );
   }
-  if (ship.leftEngine) {
+  if (ship.hasFuel() && ship.leftEngine) {
     drawTriangle(
       [ship.w * -0.5, ship.h * -0.25],
       [ship.w * -0.5 - Math.random() * 10, 0],
@@ -172,13 +177,13 @@ function updateShip() {
 
 
 ship.dy += gravity;
-if(ship.mainEngine){
+if(ship.hasFuel() && ship.mainEngine){
   ship.dy -= mainEngineThrust;
 }
-if(ship.rightEngine){
+if(ship.hasFuel() && ship.rightEngine){
   ship.dx -= sideEngineThrust;
 }
-if(ship.leftEngine){
+if(ship.hasFuel() && ship.leftEngine){
   ship.dx += sideEngineThrust;
 }
 ship.y += ship.dy;
@@ -300,6 +305,7 @@ function gameLoop() {
   } else {
     // Clear entire screen
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillText(`fuel: $({Math.floor}`,2,10);
     drawShip();
     drawPrjs();
     drawPlatform();
