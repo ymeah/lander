@@ -206,6 +206,12 @@ function updatePjrs() {
     prj.x += prj.dx;
   }
 }
+
+function distance(a,b){
+  //Math.hypot(X part-0,Y part-1);
+  return Math.hypot(a[0]-b[0],a[1]-b[1]);
+}
+
 function checkCollision() {
   const top = ship.top;
   const bottom = ship.bottom;
@@ -219,8 +225,9 @@ function checkCollision() {
   if (ship.overlaps(platform)) {
     ship.crashed = true;
     return;
-   }
-   for (let i = 0; i < prjs.length; i++) {
+  }
+
+  for (let i = 0; i < prjs.length; i++) {
     let prj = prjs[i];
     if (ship.overlaps(prj)) {
       ship.crashed = true;
@@ -228,6 +235,31 @@ function checkCollision() {
     }
   }
   
+  for(let i = 0; i < terrain.length -1; i++){
+    const a = terrain[i];
+    const b = terrain[i+1];
+    const l = [ship.left,ship.bottom];
+    const r = [ship.right,ship.bottom];
+
+    const abLen = distance(a,b);
+    const alLen = distance(a,l);
+    const arLen = distance(a,r);
+    const lbLen = distance(l,b);
+    const rbLen = distance(r,b);
+
+    const fudge = 0.1;
+    if(abLen + fudge > alLen + lbLen){
+      console.log("left corner crash");
+      ship.crashed = true;
+      return;
+    }
+    if(abLen + fudge> arLen + rbLen){
+      console.log("right corner crash");
+      ship.crashed = true;
+      return;
+    }
+
+  }
   // const isNotOverlapingPlatform =
   //   bottom < platform.top ||
   //   top > platform.bottom ||
